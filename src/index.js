@@ -32,6 +32,7 @@ app.get('/', (req, res) => {
     title: q.title,
     description: q.description,
     answers: q.answers.length,
+    votes: q.votes,
   }));
   res.send(qs);
 });
@@ -52,6 +53,7 @@ app.post('/', (req, res) => {
     title,
     description,
     answers: [],
+    votes: 0,
   };
   questions.push(newQuestion);
   res.status(200).send();
@@ -68,6 +70,28 @@ app.post('/answer/:id', (req, res) => {
   question[0].answers.push({
     answer,
   });
+
+  res.status(200).send();
+});
+
+
+// upvote a question
+app.post('/upvote/:id', (req, res) => {
+  const question = questions.filter(q => (q.id === parseInt(req.params.id)));
+  if (question.length > 1) return res.status(500).send();
+  if (question.length === 0) return res.status(404).send();
+
+  question[0].votes++;
+
+  res.status(200).send();
+});
+
+app.post('/downvote/:id', (req, res) => {
+  const question = questions.filter(q => (q.id === parseInt(req.params.id)));
+  if (question.length > 1) return res.status(500).send();
+  if (question.length === 0) return res.status(404).send();
+
+  if (question[0].votes > 0) question[0].votes--;
 
   res.status(200).send();
 });
